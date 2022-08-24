@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dtsf="https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/12/31/DefinicjeTypySprawozdaniaFinansowe/" xmlns:etd="https://www.gov.pl/static/finanse/typy/DefinicjeTypy/" xmlns:fi="https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyStruktury/" xmlns:fi1="https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjny/" targetNamespace="https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjny/" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" xml:lang="pl">
+	<xsd:import namespace="https://www.gov.pl/static/finanse/typy/DefinicjeTypy/" schemaLocation="https://www.gov.pl/static/finanse/typy/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"/>
+	<xsd:import namespace="https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/12/31/DefinicjeTypySprawozdaniaFinansowe/" schemaLocation="https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/12/31/DefinicjeTypySprawozdaniaFinansowe/StrukturyDanychSprFin_v1-6.xsd"/>
+	<xsd:import namespace="https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyStruktury/" schemaLocation="https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyStruktury/FunduszInwestycyjnyStrukturyDanychSprFin_v1-6.xsd"/>
+	<xsd:element name="FunduszInwestycyjny">
+		<xsd:annotation>
+			<xsd:documentation>Struktura sprawozdania funduszu inwestycyjnego</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Naglowek" type="fi:TNaglowekSprawozdaniaFinansowegoFunduszInwestycyjny">
+					<xsd:annotation>
+						<xsd:documentation>Nagłówek</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="WprowadzenieDoSprawozdaniaFinansowegoFI">
+					<xsd:annotation>
+						<xsd:documentation>Wprowadzenie do sprawozdania finansowego</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="P_1">
+								<xsd:annotation>
+									<xsd:documentation>Dane identyfikacyjne funduszu</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="P_1A" type="dtsf:TNazwaFirmy">
+											<xsd:annotation>
+												<xsd:documentation>Nazwa funduszu</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_1B" type="etd:TTekstowy">
+											<xsd:annotation>
+												<xsd:documentation>Typ funduszu</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_1C" type="etd:TTekstowy">
+											<xsd:annotation>
+												<xsd:documentation>Numer w rejestrze funduszy</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_1D" type="etd:TNrNIP" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>NIP</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_1E" type="dtsf:TDataSF">
+											<xsd:annotation>
+												<xsd:documentation>Data utworzenia funduszu</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_1F" type="dtsf:TZakresDatOpcjonalnych">
+											<xsd:annotation>
+												<xsd:documentation>Okres, na jaki fundusz został utworzony</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="P_2" minOccurs="0" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Odnośnie do funduszy, o których mowa w art. 170 ustawy, w przypadku sprawozdania finansowego funduszu powiązanego wskazanie nazwy funduszu podstawowego, a w przypadku sprawozdania finansowego funduszu podstawowego wskazanie nazw wszystkich funduszy powiązanych</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="P_2A" type="dtsf:TNazwaSiedziba">
+											<xsd:annotation>
+												<xsd:documentation>Nazwy i siedziby funduszy powiązanych</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="P_3" type="etd:TTekstowy" maxOccurs="10">
+								<xsd:annotation>
+									<xsd:documentation>Zwięzły opis celu inwestycyjnego, specjalizacji i stosowanych ograniczeń inwestycyjnych funduszu</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="P_4">
+								<xsd:annotation>
+									<xsd:documentation>Firma, siedziba i adres towarzystwa będącego organem funduszu, ze wskazaniem właściwego rejestru</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="P_4A" type="dtsf:TNazwaSiedziba">
+											<xsd:annotation>
+												<xsd:documentation>Firma</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_4B" type="dtsf:TAdresZOpcZagranicznym">
+											<xsd:annotation>
+												<xsd:documentation>Adres</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_4C" type="etd:TTekstowy">
+											<xsd:annotation>
+												<xsd:documentation>Rejstr właściwy dla towarzystwa</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="P_5">
+								<xsd:annotation>
+									<xsd:documentation>Okres sprawozdawczy</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:complexContent>
+										<xsd:extension base="dtsf:TZakresDatSF">
+											<xsd:sequence>
+												<xsd:element name="P_5A" type="dtsf:TDataSF">
+													<xsd:annotation>
+														<xsd:documentation>Dzień bilansowy</xsd:documentation>
+													</xsd:annotation>
+												</xsd:element>
+											</xsd:sequence>
+										</xsd:extension>
+									</xsd:complexContent>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="P_6">
+								<xsd:annotation>
+									<xsd:documentation>Wskazanie, czy sprawozdanie finansowe zostało sporządzone przy założeniu kontynuowania działalności przez fundusz w dającej się przewidzieć przyszłości oraz czy nie istnieją okoliczności wskazujące na zagrożenie kontynuowania działalności funduszu</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="P_6A" type="xsd:boolean">
+											<xsd:annotation>
+												<xsd:documentation>Wskazanie, czy sprawozdanie finansowe zostało sporządzone przy założeniu kontynuowania działalności przez fundusz w dającej się przewidzieć przyszłości</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_6B" type="xsd:boolean">
+											<xsd:annotation>
+												<xsd:documentation>Wskazanie, czy nie istnieją okoliczności wskazujące na zagrożenie kontynuowania działalności funduszu</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_6C" type="etd:TTekstowy" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Opis okoliczności</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="P_7">
+								<xsd:annotation>
+									<xsd:documentation>W przypadku sprawozdania finansowego sporządzonego za okres, w ciągu którego nastąpiło połączenie funduszy, wskazanie, że jest to sprawozdanie finansowe sporządzone po połączeniu funduszy, oraz określenie nazw i numerów w rejestrach funduszy, które zostały połączone</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="P_7A" type="xsd:boolean">
+											<xsd:annotation>
+												<xsd:documentation>Wskazanie, że jest to sprawozdanie finansowe sporządzone po połączeniu funduszy</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_7B" minOccurs="0" maxOccurs="unbounded">
+											<xsd:annotation>
+												<xsd:documentation>Określenie nazw i numerów w rejestrach funduszy, które zostały połączone</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="P_7B_1" type="dtsf:TNazwaFirmy">
+														<xsd:annotation>
+															<xsd:documentation>Nazwa</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+													<xsd:element name="P_7B_2" type="etd:TTekstowy">
+														<xsd:annotation>
+															<xsd:documentation>Numer w rejestrze</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="P_8" type="etd:TTekstowy">
+								<xsd:annotation>
+									<xsd:documentation>Wskazanie podmiotu, który przeprowadził badanie (przegląd) sprawozdania finansowego</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="P_9" type="etd:TTekstowy">
+								<xsd:annotation>
+									<xsd:documentation>Wskazanie rynku, na którym notowane są certyfikaty inwestycyjne</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="P_10" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Wskazanie serii certyfikatów inwestycyjnych i cech je różnicujących</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="P_10A" type="etd:TTekstowy">
+											<xsd:annotation>
+												<xsd:documentation>Seria</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_10B" type="etd:TTekstowy">
+											<xsd:annotation>
+												<xsd:documentation>Cechy różnicujące</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="P_11" type="etd:TTekstowy" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Wskazanie emisji certyfikatów inwestycyjnych</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="P_12" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Wskazanie kategorii jednostek uczestnictwa i cech je różnicujących</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="P_12A" type="etd:TTekstowy">
+											<xsd:annotation>
+												<xsd:documentation>Kategoria</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_12B" type="etd:TTekstowy">
+											<xsd:annotation>
+												<xsd:documentation>Cechy różnicujące</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="P_13" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Informacja uszczegóławiająca, wynikająca z potrzeb lub specyfiki jednostki</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="P_13A" type="dtsf:TPozycjaUzytkownika" minOccurs="0" maxOccurs="unbounded">
+											<xsd:annotation>
+												<xsd:documentation>Informacja uszczegóławiająca, wynikająca z potrzeb lub specyfiki jednostki</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="ZestawienieLokat">
+					<xsd:annotation>
+						<xsd:documentation>Zestawienie lokat</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="TabelaGlowna" type="fi:TabelaGlowna">
+								<xsd:annotation>
+									<xsd:documentation>Tabela główna</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="TabeleUzupelniajace" type="fi:TabeleUzupelniajace">
+								<xsd:annotation>
+									<xsd:documentation>Tabela uzupełniająca</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="TabeleDodatkowe" type="fi:TabeleDodatkowe" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Tabela dodatkowa</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="Bilans" type="fi:BilansFI">
+					<xsd:annotation>
+						<xsd:documentation>Bilans</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="RachunekWynikuZOperacji" type="fi:RachunekWynikuZOperacjiFI">
+					<xsd:annotation>
+						<xsd:documentation>Rachunek wyniku z operacji</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="AktywaZmiany" type="fi:AktywaZmianyFI">
+					<xsd:annotation>
+						<xsd:documentation>Zestawienie zmian w aktywach netto</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Przeplywy" type="fi:PrzeplywyFI" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Zestawienie przepływów pieniężnych</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="NotyObjasniajaceFI">
+					<xsd:annotation>
+						<xsd:documentation>Noty objasniające</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="NotaObjasniajaca" type="dtsf:TInformacjaDodatkowa" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Nota objasniająca</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="InformacjaDodatkowaFI">
+					<xsd:annotation>
+						<xsd:documentation>Informacja dodatkowa</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="InformacjaDodatkowa" type="dtsf:TInformacjaDodatkowa" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Informacja dodatkowa</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
