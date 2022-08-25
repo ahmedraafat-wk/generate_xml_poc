@@ -1,27 +1,14 @@
 #!/usr/local/bin/python3
-import requests
 import json
-import os
-from dotenv import load_dotenv
-from pprint import pp, pprint
+from pprint import pprint
+
+import requests
 
 
-# Load the environment variables
-load_dotenv()
-
-# AUTH_URL = os.getenv('AUTH_URL')
-# SS_API_URL = os.getenv('SS_API_URL')
-API_URL = os.getenv('API_URL')
-CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
-SHEET_ID = os.getenv('SHEET_ID')
-
-
-class PlatformAPI:
-    def __init__(self, url: str):
+class SpreadsheetsApi:
+    def __init__(self, url, access_token):
         self._url = url
-        self._access_token = None
+        self._access_token = access_token
 
     def _get_headers(self):
         '''
@@ -40,25 +27,25 @@ class PlatformAPI:
     def _get(self, path):
         '''
         A helper function to retrieve all the data from the passed URL
-        
+
         :param path: The path to retrieve all the data from
-        
+
         :returns resp: The response object
         '''
 
         url = self._url + path
         resp = requests.get(url, headers=self._get_headers())
-        return resp.json()
+        return json.loads(resp.text)
 
     def _post(self, path, data=None, body=None, headers=None):
         '''
         A helper function to do the POST request, then return the json encoded response
-        
+
         :param path: The path to use for the post request
         :param data: (optional) list of tuples that will be added to the request body
         :param body: (optional) json list to be added to the request body
         :param headers: the request headers
-        
+
         :returns resp: The response object
         '''
 
@@ -69,10 +56,10 @@ class PlatformAPI:
     def _put(self, path, data):
         '''
         A helper function to do the PUT request, then return the request status code
-        
+
         :param path: The path to use for the update request
         :param data: (optional) list of tuples that will be added to the request body
-        
+
         :rerurns resp.status_code: the request response status code.
         '''
 
@@ -81,45 +68,46 @@ class PlatformAPI:
                             headers=self._get_headers())
         return resp.status_code
 
-    def authenticate(self, client_id: str, client_secret: str):
+    def _process_sheet_data(self, sheet_values):
         '''
-        This function authenticate the user by the client id & secret with the Workiva platform API
-        
-        :param client_id: a string value that represent the client ID
-        :param client_secret: a string value that represent the client secret
-        
-        :return assign the retrieved auth token to the class access_token var.
+        This function process the retrieved sheet data and change it from json format into hashmap with key, value formats
+
+        :param sheet_values: A python object of the sheet values
+
+        :return sheet_values_map: A map with key value pairs for the sheet values (key is the 1st cell and last non empty cell in the key's row)
         '''
 
-        data = 'client_id=' + client_id + '&client_secret=' + \
-            client_secret + '&grant_type=client_credentials'
-        self._access_token = self._post(
-            '/iam/v1/oauth2/token', data, {}, {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'})['access_token']
+        sheet_values_map = {}
+        for row in sheet_values['data']['values']:
+            sheet_values_map[row[0]] = row[-1]
+        return sheet_values_map
 
-    def get_sheet_data(self, spreadsheet_id: str, sheet_id: str):
+    def get_sheet_data(self, spreadsheet_id, sheet_id, region):
         '''
-        A function that returns all the data for the given sheet
-        
+        This function rturns a map {key: value} where is the key is the first cell in the sheet,
+          and the value the last non empty cell in the key row.
+
         :param spreadsheet_id: the spreadsheet ID to use in the API
         :param sheet_id: the sheet ID that we want to retrieve all the data from.
-        
+        :param region: a string value that represent the region we want to read it is data, i,e. A1
+
         "return data: A list for the retrieved data
         '''
 
-        path = '/platform/v1/spreadsheets/' + \
-            spreadsheet_id + '/sheets/' + sheet_id + '/sheetdata'
+        path = '/spreadsheets/v1/spreadsheets/' + \
+            spreadsheet_id + '/sheets/' + sheet_id + '/data/' + region
         data = self._get(path)
-        return data
+        return self._process_sheet_data(data)
 
     def update_range(self, spreadsheet_id, sheet_id, region, values):
         '''
         This function will update a specific sheet range with the values
-        
+
         :param spreadsheet_id: the spreadsheet ID to use in the API
         :param sheet_id: the sheet ID that we want to update
         :param region: a string value that represent the region we want to modify, i,e. A1
         :param values: A list of list for each row value. i.e. [['Row1-Col1 Data', 'Row1-Col2 Data], ['Row2-Col1 Data', 'Row2-Col2 Data]]
-        
+
         :return just prints the status_code of the request
         '''
 
@@ -131,9 +119,9 @@ class PlatformAPI:
     def create_spreadsheet(self, spreadsheet_name):
         '''
         This function will create a new spreadsheet
-        
+
         :param spreadsheet_name: a string value that represent the spreadsheet name
-        
+
         :return spreadsheet_id: a string value of the created spreadsheet ID
         '''
 
@@ -145,10 +133,10 @@ class PlatformAPI:
     def create_sheet(self, spreadsheet_id, name):
         '''
         This function will create a new sheet in the assigned spreadsheet
-        
+
         :param spreadsheet_id: the spreadsheet ID we want to add new sheet for
         :param name: a string value that represent the sheet name
-        
+
         :return sheet_id: a string value of the created sheet ID
         '''
 
@@ -161,38 +149,3 @@ class PlatformAPI:
         sheet_id = self._post(path, {}, body, self._get_headers())[
             'data']['id']
         return sheet_id
-
-
-def get_sheet_values():
-    return [
-        [
-            "FunduszInwestycyjny",
-            "No type specified",
-            "Struktura sprawozdania funduszu inwestycyjnego",
-        ],
-        ["NotyObjasniajaceFI", "No type specified", "Noty objasniaj\xc4\x85ce"],
-        [
-            "NotaObjasniajaca",
-            "dtsf:TInformacjaDodatkowa",
-            "Nota objasniaj\xc4\x85ca",
-        ],
-        ["InformacjaDodatkowaFI", "No type specified", "Informacja dodatkowa"],
-        [
-            "InformacjaDodatkowa",
-            "dtsf:TInformacjaDodatkowa",
-            "Informacja dodatkowa",
-        ]
-    ]
-
-
-def main():
-    api = PlatformAPI(API_URL)
-    api.authenticate(CLIENT_ID, CLIENT_SECRET)
-    spreadsheet_id = api.create_spreadsheet('Test From Local 5')
-    sheet_id = api.create_sheet(spreadsheet_id, 'Schema Sheet')
-    api.update_range(spreadsheet_id, sheet_id, ':',
-                     {"values": get_sheet_values()})
-
-
-if __name__ == "__main__":
-    main()
