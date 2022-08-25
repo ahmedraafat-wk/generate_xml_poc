@@ -1,9 +1,11 @@
 #!/usr/local/bin/python3
+import os
+from pprint import pprint
+
+from dotenv import load_dotenv
+
 from ApiAuth import ApiAuth
 from SpreadsheetsApi import SpreadsheetsApi
-from dotenv import load_dotenv
-import os
-
 
 # Load the environment variables
 load_dotenv()
@@ -13,6 +15,7 @@ CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
 SHEET_ID = os.getenv('SHEET_ID')
+
 
 def get_sheet_values():
     return [
@@ -150,15 +153,30 @@ def get_sheet_values():
     ]
 
 
-def main():
-    api_auth = ApiAuth(API_URL)
-    acess_token = api_auth.authenticate(CLIENT_ID, CLIENT_SECRET)
-    spreadshets_api = SpreadsheetsApi(API_URL, acess_token)
-    spreadsheet_id = spreadshets_api.create_spreadsheet('Test From Local 1')
+def create_spreadsheet_with_schema_values(spreadshets_api):
+    spreadsheet_id = spreadshets_api.create_spreadsheet('Test From Local 2')
     sheet_id = spreadshets_api.create_sheet(spreadsheet_id, 'Schema Sheet')
     spreadshets_api.update_range(spreadsheet_id, sheet_id, ':',
-                     {"values": get_sheet_values()})
+                                 {"values": get_sheet_values()})
+
+
+def read_spreadsheet_data(spreadshets_api):
+    sheet_values = spreadshets_api.get_sheet_data(
+        SPREADSHEET_ID, SHEET_ID, ':')
+    pprint(sheet_values)
 
 
 if __name__ == "__main__":
-    main()
+    api_auth = ApiAuth(API_URL)
+    acess_token = api_auth.authenticate(CLIENT_ID, CLIENT_SECRET)
+    spreadshets_api = SpreadsheetsApi(API_URL, acess_token)
+
+    '''
+    Until now I don't think it will be possible to run the two calls (create & read) at the same script.
+    So, creating spreadsheet with schema keys must be done first then whenever the user finished filling the data, the user should run now the code 
+    with the spreadsheet & sheet IDs to be used to read the data from.
+    '''
+    if SPREADSHEET_ID == None and SHEET_ID == None:
+        create_spreadsheet_with_schema_values(spreadshets_api)
+    else:
+        read_spreadsheet_data(spreadshets_api)
