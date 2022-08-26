@@ -1,40 +1,14 @@
 from lxml import etree
-import requests as req
-
-
-class SchemaReader:
-    def __init__(self, schema_path= 'FunduszInwestycyjny_v1-6.xsd', verbose= True):
-        with open(schema_path) as schema_file:
-            self._schema_doc = etree.parse(schema_file)
-
-        self._schema = self._schema_doc.getroot()
-        self._root = self._schema[-1]
-        self._tag_prefix = '{' + self._schema.nsmap.get('xsd') + '}'
-    
-    def get_root_name(self):
-        return self._root.get('name')
-    
-    def get_root_docstring(self):
-        return self._root[0][0].text
-    
-    def get_root_children(self):
-        return list(self._root)
-
-    def get_root(self):
-        return self._root
-
-    def get_schema(self):
-        return self._schema
-
-    def get_tag_prefix(self):
-        return self._tag_prefix
+from SchemaWalker import SchemaWalker
 
 
 class XMLBuilder:
-
-    def __init__(self):
-        self._sr = SchemaReader()
-        self._xml_root = etree.Element(self._sr.get_root_name())
+    """
+    Builds on top of the SchemaWalker to use client data and generate an XML file that would satisfy the schema
+    """
+    def __init__(self, schema_walker):
+        self._schema_walker = schema_walker
+        self._xml_root = etree.Element(self._schema_walker.get_root_name())
         self._tag_text_map = {
             "AktywaZmiany": 49,
             "Bilans": 47,
@@ -95,9 +69,16 @@ class XMLBuilder:
     def get_root(self):
         return self._xml_root
 
-    def construct_xml_from_element(self, schema_element = None, xml_parent= None):
+    def construct_xml_from_element(self, schema_element=None, xml_parent=None):
+        """
+        Recursive function to walk the schema while simultaniously building up the xml tree with element that will
+        satisfy the schema requirements.
+        :param schema_element: The current tree node in the schema
+        :param xml_parent: The xml tag that should be a parent of newly generated tree nodes
+        :return: None
+        """
         if schema_element is None:
-            schema_element = self._sr.get_root()
+            schema_element = self._schema_walker.get_root()
 
         tag_suffix = schema_element.tag.split('}')[1]
         match tag_suffix:
@@ -106,23 +87,24 @@ class XMLBuilder:
             case 'complexType':
                 if schema_element.get('name') is not None and len(schema_element) > 1:
                     xml_parent = self._construct_on_element(schema_element, xml_parent)
-            case 'complexContent':
-                pass
-            case 'sequence':
-                pass
-            case 'annotation':
-                pass
             case 'extension':
                 self._construct_on_extension(schema_element, xml_parent)
-            case other:
+            case _:
                 pass
 
         for schema_child in schema_element:
             self.construct_xml_from_element(schema_child, xml_parent)
     
     def _construct_on_element(self, schema_element, xml_parent):
+        """
+        Element node is the main one we're looking at, since it describes the tag that need to be in the xml.
+        With each element node found, I am adding a tag new to the xml, keeping the child-parent structure
+        :param schema_element: The element tree node in the schema that defines the xml tag
+        :param xml_parent: The xml tag that should be a parent of the tag constructed here from schema element
+        :return: The xml tree node that was just created, should be a parent to following elements
+        """
         if xml_parent is None:
-            xml_parent = self._xml_root
+            xml_parent = self._xml_root  # xml_parent should only be None at the top of the tree
             xml_parent.text = str(self._tag_text_map.get(schema_element.get('name'), 'No user input'))
         else:
             xml_child = etree.SubElement(xml_parent, schema_element.get('name'))
@@ -132,50 +114,22 @@ class XMLBuilder:
         return xml_parent
     
     def _construct_on_extension(self, schema_element, xml_parent):
-        base_tag = schema_element.get('base')
-        if base_tag is None:
-            raise ValueError('Extension element does not have *base* attribute')
+        """
+        Taking advantage of schema walker functionality to get the base element from remote namespace
+        :param schema_element: The extension tree node in the schema that has the name of the element to be looked up
+        :param xml_parent: The tree node of xml that is being constructed, that this element will be child of
+        :return: None
+        """
 
-        needed_namespace_prefix, base_name = base_tag.split(':')
-        needed_namespace = self._sr.get_root().nsmap.get(needed_namespace_prefix)
-        if needed_namespace is None:
-            raise ValueError('Needed namespace prefix not in namespace map')
-
-        import_tag = None
-        for child in self._sr.get_schema():
-            if (child.tag == self._sr.get_tag_prefix() + 'import') and (child.get('namespace') == needed_namespace):
-                import_tag = child
-        if import_tag is None:
-            raise ValueError('Import tag with needed namespace was not found')
-        
-        import_namespace_url = import_tag.get('schemaLocation')
-        if import_namespace_url is None:
-            raise ValueError('Import tag does not have *schemaLocation* attribute')
-
-        schema_response = req.get(import_namespace_url)
-        if not schema_response.ok:
-            raise RuntimeError('Request for imported namespace did not go through')
-        import_root = etree.fromstring(schema_response.content)
-        
-        base_element = self._find_by_name(import_root, base_name)
-        if base_element is None:
-            raise ValueError('Base element was not found in the imported namespace xml')
-        
+        base_element = self._schema_walker.load_base_element(schema_element)
         self.construct_xml_from_element(base_element, xml_parent)
-    
-    def _find_by_name(slef, import_root, base_name):
-        for child_elem in import_root:
-            if child_elem.get('name') == base_name:
-                return child_elem
-        
-        return None
 
 
-xmlb = XMLBuilder()
-xmlb.construct_xml_from_element()
+if __name__ == '__main__':
+    sw = SchemaWalker()
+    xmlb = XMLBuilder(schema_walker=sw)
+    xmlb.construct_xml_from_element()
 
-
-with open('XML_from_shema.xml', 'w') as new_xml:
-    new_xml.write(
-        etree.tostring(xmlb.get_root(), pretty_print= True, xml_declaration= True).decode('ASCII')
-        )
+    with open('XML_from_shema.xml', 'w') as new_xml:
+        string_xml = etree.tostring(xmlb.get_root(), pretty_print=True, xml_declaration=True).decode('ASCII')
+        new_xml.write(string_xml)
