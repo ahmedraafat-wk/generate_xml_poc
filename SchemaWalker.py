@@ -41,18 +41,17 @@ class SchemaWalker:
         """
         tag_suffix = get_tag_suffix(element)
 
-        match tag_suffix:
-            case 'element':
-                self._process_element_tag(element)
-            case 'complexType':
-                self._process_complex_type_tag(element)
-            case 'complexContent':
-                self._process_complex_content_tag(element)
-            case 'sequence':
-                for sequence_child in element.iterchildren():
-                    self._process_tree_element(sequence_child)
-            case _:
-                pass
+        if tag_suffix == 'element':
+            self._process_element_tag(element)
+        elif tag_suffix == 'complexType':
+            self._process_complex_type_tag(element)
+        elif tag_suffix == 'complexContent':
+            self._process_complex_content_tag(element)
+        elif tag_suffix == 'sequence':
+            for sequence_child in element.iterchildren():
+                self._process_tree_element(sequence_child)
+        else:
+            pass
 
     def _process_element_tag(self, element):
         """

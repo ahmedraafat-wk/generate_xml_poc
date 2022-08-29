@@ -26,16 +26,15 @@ class XMLBuilder:
             schema_element = self._schema_walker.get_root()
 
         tag_suffix = schema_element.tag.split('}')[1]
-        match tag_suffix:
-            case 'element':
+        if tag_suffix == 'element':
+            xml_parent = self._construct_on_element(schema_element, xml_parent)
+        elif tag_suffix == 'complexType':
+            if schema_element.get('name') is not None and len(schema_element) > 1:
                 xml_parent = self._construct_on_element(schema_element, xml_parent)
-            case 'complexType':
-                if schema_element.get('name') is not None and len(schema_element) > 1:
-                    xml_parent = self._construct_on_element(schema_element, xml_parent)
-            case 'extension':
-                self._construct_on_extension(schema_element, xml_parent)
-            case _:
-                pass
+        elif tag_suffix == 'extension':
+            self._construct_on_extension(schema_element, xml_parent)
+        else:
+            pass
 
         for schema_child in schema_element:
             self.construct_xml_from_element(schema_child, xml_parent)
