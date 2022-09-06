@@ -45,7 +45,7 @@ def generate_xml(spreadsheets_api, schema_walker):
     xmlb = XMLBuilder(schema_walker, sheet_data)
     xmlb.construct_xml_from_element()
 
-    with open('XML_from_shema.xml', 'w') as new_xml:
+    with open('XML_from_schema.xml', 'w') as new_xml:
         string_xml = etree.tostring(
             xmlb.get_root(), pretty_print=True, xml_declaration=True).decode('ASCII')
         new_xml.write(string_xml)
